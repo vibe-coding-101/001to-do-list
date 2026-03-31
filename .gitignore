@@ -1,0 +1,42 @@
+# 依赖
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 构建产物
+dist/
+dist-ssr/
+*.local
+
+# 编辑器
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 日志
+logs/
+*.log
+
+# Docker
+.dockerignore
+
+# 部署
+.vercel/
+.netlify/
+
+# 缓存
+.cache/
+.parcel-cache/

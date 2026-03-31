@@ -1,0 +1,110 @@
+/**
+ * 全局样式
+ */
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 容器 */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* 工具类 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--duration-normal) var(--easing-standard);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 列表过渡 */
+.list-enter-active,
+.list-leave-active {
+  transition: all var(--duration-slow) var(--easing-standard);
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* 移动端优化 */
+@media (max-width: 767px) {
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+/* 无障碍 - 屏幕阅读器隐藏 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

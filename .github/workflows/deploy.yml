@@ -1,0 +1,84 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build and Deploy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: src/frontend
+        run: npm ci
+
+      - name: Run linter
+        working-directory: src/frontend
+        run: npm run lint
+
+      - name: Build application
+        working-directory: src/frontend
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./src/frontend/dist
+          cname: todo.yourdomain.com # 自定义域名(可选)
+
+      - name: Deploy to Vercel (Alternative)
+        if: false # 设为 true 以启用 Vercel 部署
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: src/frontend
+
+      - name: Deploy to Netlify (Alternative)
+        if: false # 设为 true 以启用 Netlify 部署
+        uses: nwtgck/actions-netlify@v2.1
+        with:
+          publish-dir: './src/frontend/dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Upload deployment artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: src/frontend/dist
+          retention-days: 30
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi

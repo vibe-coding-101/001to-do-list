@@ -203,7 +203,20 @@ npm run type-check
 
 ## 更新日志
 
-### v1.0.0 (2026-03-31)
+### v0.1.1 (2026-03-31)
+
+**Bug 修复**
+- 🐛 修复 Docker 容器 unhealthy 问题
+  - 添加 HEALTHCHECK 指令到 Dockerfile
+  - 使用 wget 检查 HTTP 服务健康状态（每 30 秒，超时 3 秒）
+  - start-period 5 秒，retries 3 次
+  - 容器状态现在正确显示为 healthy
+
+**文档更新**
+- 📝 统一所有文档版本号为 v0.1.1
+- 📝 与 git 分支版本保持一致
+
+### v0.1.0 (2026-03-31)
 
 - ✅ 初始版本发布
 - ✅ 实现核心任务管理功能

@@ -1,7 +1,7 @@
 # 部署指南
 
 **项目名称**: 待办事项列表应用 (To-Do List App)
-**文档版本**: v1.0
+**文档版本**: v0.1.1
 **创建日期**: 2026-03-31
 **运维工程师**: 小虾米
 
@@ -475,7 +475,7 @@ sudo tail -f /var/log/nginx/error.log
 docker-compose down
 
 # 切换到旧版本镜像
-docker tag todo-list-app:v1.0 todo-list-app:latest
+docker tag todo-list-app:v0.1.1 todo-list-app:latest
 
 # 启动服务
 docker-compose up -d
@@ -488,7 +488,7 @@ docker-compose up -d
 sudo cp -r /var/www/todo-app /var/www/todo-app.backup
 
 # 恢复旧版本
-sudo cp -r /backups/todo-app-v1.0/* /var/www/todo-app/
+sudo cp -r /backups/todo-app-v0.1.1/* /var/www/todo-app/
 
 # 重启 Nginx
 sudo systemctl restart nginx
@@ -556,7 +556,7 @@ sudo systemctl stop nginx
 
 如有部署问题,请联系:
 - **运维工程师**: 小虾米
-- **文档版本**: v1.0
+- **文档版本**: v0.1.1
 - **最后更新**: 2026-03-31
 
 ---

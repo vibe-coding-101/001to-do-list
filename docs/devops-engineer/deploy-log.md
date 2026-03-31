@@ -10,7 +10,7 @@
 | 字段 | 内容 |
 |------|------|
 | 部署时间 | 2026-03-31 |
-| 部署版本 | v1.0 MVP |
+| 部署版本 | v0.1.1 |
 | 目标环境 | 预发布(Production Ready) |
 | 操作人 | 小虾米(devops-engineer) |
 | 部署方式 | 多平台就绪(Vercel/Netlify/Docker) |
@@ -128,7 +128,7 @@
 docker-compose down
 
 # 切换到旧版本镜像
-docker tag todo-list-app:v1.0 todo-list-app:latest
+docker tag todo-list-app:v0.1.1 todo-list-app:latest
 
 # 启动服务
 docker-compose up -d

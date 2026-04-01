@@ -1,12 +1,18 @@
 name: Docker Build and Push
 
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      docker_tags:
+        description: 'Docker镜像标签（逗号分隔）'
+        required: true
+        default: 'latest'
+        type: string
+      push_image:
+        description: '是否推送镜像到Docker Hub'
+        required: true
+        default: true
+        type: boolean
 
 jobs:
   docker:
@@ -45,8 +51,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          push: ${{ inputs.push_image }}
+          tags: ${{ inputs.docker_tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

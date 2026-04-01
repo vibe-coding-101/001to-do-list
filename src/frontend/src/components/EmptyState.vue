@@ -14,25 +14,25 @@
           width="80"
           height="80"
           rx="8"
-          fill="#F9FAFB"
-          stroke="#E5E7EB"
+          fill="#EEF2FF"
+          stroke="#C7D2FE"
         />
         <path
           d="M40 50L55 65L80 40"
-          stroke="#10B981"
+          stroke="#4F46E5"
           stroke-width="3"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
         <path
           d="M35 35H45"
-          stroke="#D1D5DB"
+          stroke="#C7D2FE"
           stroke-width="2"
           stroke-linecap="round"
         />
         <path
           d="M35 42H40"
-          stroke="#D1D5DB"
+          stroke="#C7D2FE"
           stroke-width="2"
           stroke-linecap="round"
         />
@@ -71,6 +71,20 @@ withDefaults(defineProps<Props>(), {
   padding: var(--spacing-xxl) var(--spacing-lg);
   text-align: center;
   min-height: 300px;
+  background: linear-gradient(180deg, var(--color-background) 0%, #EEF2FF 100%);
+  border-radius: var(--radius-lg);
+  animation: empty-fade-in 400ms var(--easing-enter) both;
+}
+
+@keyframes empty-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .empty-state__icon {
@@ -89,7 +103,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 .empty-state__title {
-  font-size: var(--font-size-h2);
+  font-size: 20px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-sm);

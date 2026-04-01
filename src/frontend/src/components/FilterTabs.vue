@@ -42,16 +42,18 @@ const filters: Array<{ value: FilterType; label: string }> = [
 <style scoped>
 .filter-tabs {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 2px;
+  background: var(--color-surface-dim);
+  border-radius: var(--radius-md);
+  padding: 3px;
 }
 
 .filter-tab {
-  position: relative;
-  height: 32px;
+  height: 30px;
   padding: 0 16px;
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-medium);
-  color: var(--color-secondary);
+  color: var(--color-text-secondary);
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
@@ -60,24 +62,14 @@ const filters: Array<{ value: FilterType; label: string }> = [
 }
 
 .filter-tab:hover {
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.6);
   color: var(--color-text-primary);
 }
 
 .filter-tab--active {
   color: var(--color-primary);
-  background: transparent;
-}
-
-.filter-tab--active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--color-primary);
-  border-radius: var(--radius-xs);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-1);
 }
 
 .filter-tab:focus-visible {
@@ -88,7 +80,7 @@ const filters: Array<{ value: FilterType; label: string }> = [
 /* 移动端适配 */
 @media (max-width: 767px) {
   .filter-tabs {
-    gap: var(--spacing-xs);
+    gap: 2px;
   }
 
   .filter-tab {

@@ -109,26 +109,26 @@ const emptyStateSubtitle = computed(() => {
 .task-list__items {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 10px;
 }
 
 /* 骨架屏 */
 .task-list__skeleton {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 10px;
 }
 
 .skeleton-item {
   height: 48px;
   background: linear-gradient(
     90deg,
-    var(--color-surface) 0%,
+    var(--color-surface-dim) 0%,
     var(--color-border) 50%,
-    var(--color-surface) 100%
+    var(--color-surface-dim) 100%
   );
   background-size: 200% 100%;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 

@@ -61,7 +61,7 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   display: inline-flex;
   gap: var(--spacing-xs);
   padding: 2px;
-  background: var(--color-surface);
+  background: var(--color-surface-dim);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
 }
@@ -80,7 +80,7 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
 }
 
 .priority-option:hover:not(.priority-option--active) {
-  background: var(--color-background);
+  background: rgba(255, 255, 255, 0.6);
   color: var(--color-text-primary);
 }
 
@@ -98,6 +98,7 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   background: var(--priority-high-bg);
   color: var(--priority-high-color);
   border: 1px solid var(--priority-high-border);
+  box-shadow: var(--shadow-1);
 }
 
 /* 中优先级选中态 - 通过 aria-label 区分 */
@@ -105,6 +106,7 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   background: var(--priority-medium-bg);
   color: var(--priority-medium-color);
   border: 1px solid var(--priority-medium-border);
+  box-shadow: var(--shadow-1);
 }
 
 /* 低优先级选中态 */
@@ -112,6 +114,7 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   background: var(--priority-low-bg);
   color: var(--priority-low-color);
   border: 1px solid var(--priority-low-border);
+  box-shadow: var(--shadow-1);
 }
 
 /* 移动端适配 */

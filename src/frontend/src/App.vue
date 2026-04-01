@@ -106,9 +106,16 @@ onMounted(async () => {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-1);
+  background: var(--gradient-primary);
+  background-color: var(--color-primary); /* 降级：不支持渐变时 */
+  box-shadow: var(--shadow-glass);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .header {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }
 
 .header__content {
@@ -120,8 +127,8 @@ onMounted(async () => {
 
 .header__title {
   font-size: var(--font-size-h1);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
+  font-weight: 700;
+  color: #FFFFFF;
   line-height: var(--line-height-title);
 }
 
@@ -147,9 +154,16 @@ onMounted(async () => {
   bottom: 0;
   margin-top: auto;
   padding: var(--spacing-md);
-  background: var(--color-background);
-  border-top: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
   z-index: 5;
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .input-section {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }
 
 /* 全局错误提示 */
@@ -164,11 +178,23 @@ onMounted(async () => {
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-error);
   color: white;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-3);
   z-index: 1000;
   min-width: 300px;
   max-width: 90%;
+  animation: toast-slide-in 300ms var(--easing-enter);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .error-toast__close {
@@ -185,6 +211,7 @@ onMounted(async () => {
 
 .error-toast__close:hover {
   background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
 }
 
 /* 淡入淡出动画 */
@@ -215,6 +242,7 @@ onMounted(async () => {
 
   .header__title {
     font-size: var(--font-size-h2);
+    color: #FFFFFF;
     text-align: center;
   }
 
@@ -225,6 +253,7 @@ onMounted(async () => {
 
   .input-section {
     padding: var(--spacing-sm);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   }
 
   .error-toast {

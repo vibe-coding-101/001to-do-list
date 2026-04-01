@@ -223,23 +223,29 @@ const handleDelete = async () => {
 </script>
 
 <style scoped>
+/* === 卡片样式 === */
 .task-item {
-  background: var(--color-background);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
+  border-left: 3px solid var(--priority-medium-bar);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
   box-shadow: var(--shadow-1);
-  transition: all var(--duration-normal) var(--easing-standard);
+  transition:
+    transform var(--duration-normal) var(--easing-standard),
+    box-shadow var(--duration-normal) var(--easing-standard),
+    border-color var(--duration-normal) var(--easing-standard);
 }
 
 .task-item:hover:not(.task-item--editing) {
   box-shadow: var(--shadow-2);
   transform: translateY(-2px);
+  border-color: #C7D2FE;
 }
 
 .task-item--completed {
-  background: var(--color-surface);
-  opacity: 0.8;
+  background: var(--color-background);
+  border-left-color: #CBD5E1;
 }
 
 .task-item--completed .task-text {
@@ -248,34 +254,39 @@ const handleDelete = async () => {
 }
 
 .task-item--editing {
-  border-color: var(--color-primary);
-  border-width: 2px;
-  padding: 11px 15px;
+  border: 2px solid var(--color-primary);
+  box-shadow: var(--shadow-2);
+  padding: 13px 15px;
 }
 
-/* 正常显示模式 */
+/* === 正常显示模式 === */
 .task-item__view {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
 }
 
+/* === Checkbox 圆形化 + 弹性动画 === */
 .checkbox {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border: 2px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-background);
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition:
+    background var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    transform 300ms var(--easing-spring);
+  will-change: transform;
   flex-shrink: 0;
 }
 
 .checkbox:hover {
-  border-color: var(--color-secondary);
+  border-color: #94A3B8;
 }
 
 .checkbox:focus-visible {
@@ -284,10 +295,15 @@ const handleDelete = async () => {
 }
 
 .task-item--completed .checkbox {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--gradient-primary);
+  border-color: transparent;
 }
 
+.task-item--completed .checkbox .check-icon {
+  color: #FFFFFF;
+}
+
+/* === 任务文字 === */
 .task-text {
   flex: 1;
   font-size: var(--font-size-body);
@@ -297,6 +313,7 @@ const handleDelete = async () => {
   white-space: nowrap;
 }
 
+/* === 优先级标签 === */
 .priority-badge {
   padding: 2px 8px;
   font-size: var(--font-size-xsmall);
@@ -324,6 +341,7 @@ const handleDelete = async () => {
   border: 1px solid var(--priority-low-border);
 }
 
+/* === 操作按钮 === */
 .actions {
   display: flex;
   gap: var(--spacing-xs);
@@ -341,13 +359,13 @@ const handleDelete = async () => {
   justify-content: center;
   width: 32px;
   height: 32px;
-  color: var(--color-secondary);
+  color: var(--color-text-secondary);
   border-radius: var(--radius-sm);
   transition: all var(--duration-fast) var(--easing-standard);
 }
 
 .action-button:hover {
-  background: var(--color-surface);
+  background: var(--color-surface-dim);
   color: var(--color-text-primary);
 }
 
@@ -356,7 +374,7 @@ const handleDelete = async () => {
   color: var(--priority-high-color);
 }
 
-/* 编辑模式 */
+/* === 编辑模式 === */
 .task-item__edit {
   display: flex;
   flex-direction: column;
@@ -377,7 +395,7 @@ const handleDelete = async () => {
 
 .edit-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .edit-actions {
@@ -391,13 +409,13 @@ const handleDelete = async () => {
   padding: 0 16px;
   font-size: var(--font-size-small);
   color: white;
-  background: var(--color-primary);
+  background: var(--gradient-primary);
   border-radius: var(--radius-sm);
   transition: all var(--duration-fast) var(--easing-standard);
 }
 
 .save-button:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  background: var(--gradient-primary-hover);
 }
 
 .save-button:disabled {
@@ -418,7 +436,7 @@ const handleDelete = async () => {
 }
 
 .cancel-button:hover {
-  background: var(--color-surface);
+  background: var(--color-surface-dim);
 }
 
 .error-message {
@@ -426,7 +444,7 @@ const handleDelete = async () => {
   color: var(--color-error);
 }
 
-/* 移动端适配 */
+/* === 移动端适配 === */
 @media (max-width: 767px) {
   .task-item {
     padding: 12px;

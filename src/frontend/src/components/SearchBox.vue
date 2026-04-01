@@ -182,13 +182,13 @@ defineExpose({
 }
 
 .search-box:hover {
-  border-color: #D1D5DB;
+  border-color: #CBD5E1;
 }
 
 .search-box:focus-within {
   border: 2px solid var(--color-primary);
   padding: 0 11px; /* 补偿边框宽度变化 */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .search-box__icon {
@@ -231,6 +231,7 @@ defineExpose({
 .search-box__clear:hover {
   background: var(--color-border);
   color: var(--color-text-primary);
+  border-radius: 50%;
 }
 
 .search-box__clear:active {

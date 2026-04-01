@@ -1,28 +1,12 @@
 name: Deploy to Production
 
 on:
-  workflow_dispatch:
-    inputs:
-      deploy_target:
-        description: '部署目标'
-        required: true
-        default: 'github-pages'
-        type: choice
-        options:
-          - github-pages
-          - vercel
-          - netlify
-      environment:
-        description: '部署环境'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - production
-          - staging
+  push:
+    branches:
+      - main
 
 permissions:
-  contents: write  # 允许推送代码
+  contents: write
 
 jobs:
   deploy:
@@ -55,33 +39,10 @@ jobs:
           NODE_ENV: production
 
       - name: Deploy to GitHub Pages
-        if: success() && inputs.deploy_target == 'github-pages'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./src/frontend/dist
-          cname: todo.yourdomain.com # 自定义域名(可选)
-
-      - name: Deploy to Vercel
-        if: success() && inputs.deploy_target == 'vercel'
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: src/frontend
-
-      - name: Deploy to Netlify
-        if: success() && inputs.deploy_target == 'netlify'
-        uses: nwtgck/actions-netlify@v2.1
-        with:
-          publish-dir: './src/frontend/dist'
-          production-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "Deploy from GitHub Actions"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
       - name: Upload deployment artifacts
         if: always()
@@ -90,13 +51,3 @@ jobs:
           name: build-artifacts
           path: src/frontend/dist
           retention-days: 30
-
-      - name: Notify deployment status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment successful!"
-          else
-            echo "❌ Deployment failed!"
-            exit 1
-          fi

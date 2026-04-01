@@ -196,8 +196,8 @@ npm run type-check
 
 ## 联系方式
 
-- 项目地址: https://github.com/yourusername/todo-list-app
-- 问题反馈: https://github.com/yourusername/todo-list-app/issues
+- 项目地址: https://github.com/vibe-coding-101/001to-do-list
+- 问题反馈: https://github.com/vibe-coding-101/001to-do-list/issues
 
 ---
 

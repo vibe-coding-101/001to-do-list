@@ -1,7 +1,8 @@
 # 系统架构文档
 **项目名称**: 待办事项列表应用 (To-Do List App)
-**文档版本**: v0.1.1
+**文档版本**: v0.2.0
 **创建日期**: 2026-03-31
+**更新日期**: 2026-04-01
 **架构师**: 小虾米
 
 ---
@@ -35,12 +36,17 @@ flowchart TD
         TaskInput[TaskInput.vue]
         FilterTab[FilterTab.vue]
         EmptyState[EmptyState.vue]
+        SearchBar[SearchBar.vue]
+        PrioritySelector[PrioritySelector.vue]
 
         App --> TaskList
         App --> TaskInput
         App --> FilterTab
         App --> EmptyState
+        App --> SearchBar
         TaskList --> TaskItem
+        TaskInput --> PrioritySelector
+        TaskItem --> PrioritySelector
     end
 
     UI --> Store[状态管理层 - Pinia Store]
@@ -48,6 +54,7 @@ flowchart TD
     subgraph Store["状态管理层 (Pinia Stores)"]
         TaskStore[useTaskStore]
         FilterStore[useFilterStore]
+        SearchStore[useSearchStore]
     end
 
     Store --> Service[业务逻辑层 - Services]
@@ -85,23 +92,29 @@ src/
 │   ├── TaskItem.vue          # 单个任务卡片
 │   ├── TaskInput.vue         # 任务输入框
 │   ├── FilterTab.vue         # 过滤器 Tab
-│   └── EmptyState.vue        # 空状态提示
+│   ├── EmptyState.vue        # 空状态提示
+│   ├── SearchBar.vue         # 搜索框
+│   └── PrioritySelector.vue  # 优先级选择器
 │
 ├── stores/                    # Pinia 状态管理
 │   ├── task.ts               # 任务状态 Store
-│   └── filter.ts             # 过滤器状态 Store
+│   ├── filter.ts             # 过滤器状态 Store
+│   └── search.ts             # 搜索状态 Store
 │
 ├── services/                  # 业务逻辑层
 │   ├── task.service.ts       # 任务业务逻辑
+│   ├── search.service.ts     # 搜索业务逻辑
 │   └── storage.service.ts    # LocalStorage 封装
 │
 ├── types/                     # TypeScript 类型定义
 │   ├── task.types.ts         # Task 相关类型
+│   ├── search.types.ts       # 搜索相关类型
 │   └── storage.types.ts      # Storage 相关类型
 │
 ├── utils/                     # 工具函数
 │   ├── validation.ts         # 输入验证
 │   ├── date.ts               # 日期处理
+│   ├── debounce.ts           # 防抖函数
 │   └── constants.ts          # 常量定义
 │
 ├── assets/                    # 静态资源
@@ -128,6 +141,8 @@ src/
 - `TaskInput.vue`: 任务输入框,负责创建新任务
 - `FilterTab.vue`: 过滤器 Tab,负责切换过滤状态
 - `EmptyState.vue`: 空状态提示,引导用户创建第一个任务
+- `SearchBar.vue`: 搜索框,支持实时搜索任务
+- `PrioritySelector.vue`: 优先级选择器,用于创建和编辑任务时选择优先级
 
 #### 状态管理层 (Stores - Pinia)
 - **职责**: 管理应用状态,提供响应式数据
@@ -145,6 +160,11 @@ src/
   - Actions: setFilter
   - Getters: filteredTasks
 
+- `useSearchStore`: 管理搜索状态
+  - State: searchQuery (string)
+  - Actions: setSearchQuery, clearSearchQuery
+  - Getters: isSearching
+
 #### 业务逻辑层 (Services)
 - **职责**: 封装业务逻辑和数据操作
 - **对外接口**: 纯函数和类方法
@@ -157,6 +177,11 @@ src/
   - `deleteTask(id)`: 删除任务
   - `toggleTaskStatus(id)`: 切换任务状态
   - `validateTaskInput(text)`: 验证输入
+
+- `SearchService`: 搜索相关业务逻辑
+  - `searchTasks(tasks, query)`: 根据关键词搜索任务
+  - `highlightMatch(text, query)`: 高亮匹配文本
+  - `buildSearchIndex(tasks)`: 构建搜索索引
 
 - `StorageService`: LocalStorage 封装
   - `get(key)`: 读取数据
@@ -355,7 +380,8 @@ flowchart LR
 - [待确认 2] 是否需要实现数据导出/导入功能? 【v1.1 考虑】
 - [待确认 3] 是否需要实现深色模式? 【v1.1 考虑】
 - [待确认 4] LocalStorage Schema 版本控制策略? 【使用 version 字段】
-- [待确认 5] 是否需要实现任务搜索功能? 【v1.1 考虑】
+- [待确认 5] ~~是否需要实现任务搜索功能?~~ 【v0.2.0 已实现】
+- [待确认 6] 是否需要支持高级搜索语法(如 AND/OR/NOT)? 【当前版本仅支持简单关键词搜索】
 
 ---
 
@@ -371,10 +397,116 @@ flowchart LR
 **未来可扩展功能:**
 - 云端同步 (后端 API)
 - 任务分类/标签 (数据模型扩展)
-- 任务搜索 (Service 层扩展)
+- 高级搜索 (Service 层扩展,支持布尔运算、正则表达式)
 - 数据导出/导入 (Service 层扩展)
 - 深色模式 (CSS Variables 切换)
 - 多设备同步 (WebSocket)
+
+---
+
+## 11. v0.2.0 版本架构更新
+
+### 11.1 优先级选择功能
+
+**实现方案:**
+- 数据模型已支持 `priority` 字段,无需修改
+- 新增 `PrioritySelector.vue` 组件,使用分段控制器(Segmented Control)样式
+- 在 `TaskInput.vue` 中集成优先级选择器
+- 在 `TaskItem.vue` 编辑模式中集成优先级选择器
+
+**技术要点:**
+- 使用 Pinia Store 管理当前选中的优先级状态
+- 优先级默认值为 'medium'
+- 优先级按钮使用 CSS Variables 实现动态主题色
+
+### 11.2 搜索功能
+
+**实现方案:**
+- 新增 `SearchBar.vue` 组件,提供搜索输入框
+- 新增 `useSearchStore` 管理搜索状态
+- 新增 `SearchService` 封装搜索逻辑
+- 在 `useFilterStore` 的 `filteredTasks` getter 中集成搜索逻辑
+
+**技术要点:**
+- 使用 200ms 防抖优化搜索性能
+- 搜索支持任务描述的模糊匹配(不区分大小写)
+- 搜索无结果时显示友好提示
+- 搜索框支持 ESC 清空、Ctrl/Cmd + F 聚焦快捷键
+
+**数据流设计:**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as SearchBar
+    participant SS as SearchStore
+    participant FS as FilterStore
+    participant TS as TaskStore
+
+    U->>S: 输入搜索关键词
+    S->>SS: setSearchQuery(query)
+    SS->>SS: 更新 searchQuery (防抖 200ms)
+    Note over SS: searchQuery 变化触发 computed
+    SS->>FS: 访问 filteredTasks
+    FS->>TS: 获取所有任务
+    FS->>FS: 应用过滤条件
+    FS->>FS: 应用搜索条件
+    FS-->>S: 返回过滤+搜索后的任务列表
+    S-->>U: 更新 UI 显示
+```
+
+**搜索逻辑:**
+```typescript
+// 在 useFilterStore 中
+const filteredTasks = computed(() => {
+  let tasks = taskStore.tasks
+
+  // 1. 应用过滤器
+  if (currentFilter.value === 'uncompleted') {
+    tasks = tasks.filter((t) => t.status === 'uncompleted')
+  } else if (currentFilter.value === 'completed') {
+    tasks = tasks.filter((t) => t.status === 'completed')
+  }
+
+  // 2. 应用搜索 (搜索和过滤是 AND 关系)
+  const searchQuery = searchStore.searchQuery.trim().toLowerCase()
+  if (searchQuery) {
+    tasks = tasks.filter((t) =>
+      t.text.toLowerCase().includes(searchQuery)
+    )
+  }
+
+  // 3. 排序 (按创建时间倒序)
+  return tasks.sort((a, b) => b.createdAt - a.createdAt)
+})
+```
+
+### 11.3 用户体验优化
+
+**交互动画:**
+- 使用 CSS Transitions 实现平滑过渡
+- 搜索过滤时使用 FLIP 技术实现列表重排动画
+- 优先级切换时有缩放和颜色渐变效果
+
+**键盘快捷键:**
+- `Ctrl/Cmd + F`: 聚焦搜索框
+- `ESC`: 在搜索框中清空搜索,在编辑模式中取消编辑
+- `Enter`: 在搜索框中确认搜索,在输入框中提交任务
+
+**性能优化:**
+- 搜索使用防抖(200ms)减少计算次数
+- 使用 Vue 3 的 `v-memo` 优化列表渲染
+- computed 缓存搜索和过滤结果
+
+### 11.4 兼容性考虑
+
+**向后兼容:**
+- 旧数据没有 `priority` 字段时,自动设置为 'medium'
+- LocalStorage 数据迁移逻辑在 `loadTasks()` 中处理
+
+**浏览器兼容:**
+- 搜索使用 `String.prototype.includes()`,需要 ES6 支持
+- 防抖函数使用原生 JavaScript 实现,无额外依赖
 
 ---
 

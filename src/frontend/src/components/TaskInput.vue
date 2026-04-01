@@ -11,6 +11,10 @@
         @keydown.enter="handleSubmit"
         @keydown.escape="handleCancel"
       >
+      <PrioritySelector
+        v-model="selectedPriority"
+        aria-label="选择新任务优先级"
+      />
       <button
         class="add-button"
         type="button"
@@ -48,6 +52,8 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
 import { useTaskStore } from '@/stores/task'
+import PrioritySelector from './PrioritySelector.vue'
+import type { Priority } from '@/types/task.types'
 
 const taskStore = useTaskStore()
 
@@ -55,6 +61,7 @@ const inputText = ref('')
 const error = ref('')
 const disabled = ref(false)
 const inputRef = ref<HTMLInputElement>()
+const selectedPriority = ref<Priority>('medium')
 
 const canSubmit = computed(() => {
   return inputText.value.trim().length > 0 && !disabled.value
@@ -73,14 +80,15 @@ const handleSubmit = async () => {
   try {
     disabled.value = true
 
-    // 添加任务
+    // 添加任务，使用选中的优先级
     await taskStore.addTask({
       text: inputText.value,
-      priority: 'medium'
+      priority: selectedPriority.value
     })
 
-    // 清空输入框
+    // 清空输入框，重置优先级为默认值
     inputText.value = ''
+    selectedPriority.value = 'medium'
 
     // 聚焦回输入框
     await nextTick()
@@ -95,6 +103,7 @@ const handleSubmit = async () => {
 const handleCancel = () => {
   inputText.value = ''
   error.value = ''
+  selectedPriority.value = 'medium'
 }
 
 const focus = () => {
@@ -115,6 +124,7 @@ defineExpose({
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .input-field {

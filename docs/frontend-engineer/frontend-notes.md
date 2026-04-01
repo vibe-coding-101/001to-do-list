@@ -2,8 +2,9 @@
 
 **项目名称**: 待办事项列表应用 (To-Do List App)
 **技术栈**: Vue 3 + Vite + TypeScript + Pinia
-**版本**: v0.1.1
+**版本**: v0.2.0
 **创建日期**: 2026-03-31
+**更新日期**: 2026-04-01
 
 ---
 
@@ -70,7 +71,9 @@ src/frontend/
     │   ├── TaskItem.vue     # 单个任务卡片组件
     │   ├── TaskList.vue     # 任务列表容器组件
     │   ├── FilterTabs.vue   # 过滤器 Tab 组件
-    │   └── EmptyState.vue   # 空状态提示组件
+    │   ├── EmptyState.vue   # 空状态提示组件
+    │   ├── PrioritySelector.vue # 优先级选择器组件（v0.2.0 新增）
+    │   └── SearchBox.vue    # 搜索框组件（v0.2.0 新增）
     │
     ├── stores/              # Pinia 状态管理
     │   ├── task.ts          # 任务状态 Store
@@ -117,6 +120,7 @@ src/frontend/
 - ✅ **删除任务**: 点击删除按钮移除任务
 - ✅ **设置优先级**: 创建任务时可设置优先级（高/中/低）
 - ✅ **过滤任务**: 按状态过滤（全部/未完成/已完成）
+- ✅ **搜索任务**: 实时搜索任务描述（v0.2.0 新增）
 - ✅ **数据持久化**: 所有操作自动保存到 LocalStorage
 
 ### 6.2 交互特性
@@ -145,9 +149,9 @@ src/frontend/
 - `getters`: completedTasks, uncompletedTasks, taskCount
 
 **过滤器 Store (useFilterStore)**:
-- `state`: currentFilter
-- `actions`: loadFilter, setFilter
-- `getters`: filterLabel
+- `state`: currentFilter, searchQuery（v0.2.0 新增）
+- `actions`: loadFilter, setFilter, setSearchQuery（v0.2.0 新增）
+- `getters`: filterLabel, hasActiveSearch（v0.2.0 新增）
 
 ### 7.2 数据持久化
 
@@ -292,7 +296,7 @@ npm run build
 ## 11. 后续扩展计划
 
 ### v1.1 功能
-- [ ] 任务搜索
+- [x] 任务搜索（v0.2.0 完成）
 - [ ] 任务分类/标签
 - [ ] 任务截止日期
 - [ ] 数据导出/导入
@@ -306,7 +310,59 @@ npm run build
 
 ## 12. 变更记录
 
-### 2026-03-31 - v1.0 初始版本
+### 2026-04-01 - v0.2.0 搜索功能开发
+
+**新增组件**:
+- ✅ `SearchBox.vue` - 搜索框组件
+  - 实时搜索，200ms 防抖（使用原生 setTimeout 实现）
+  - 搜索关键词最大长度限制 50 字符（安全要求 SR-003）
+  - ESC 键清空搜索框
+  - 清除按钮（有内容时显示）
+  - 无障碍支持（`role="searchbox"` + `aria-label`）
+  - 响应式设计：桌面端 240px 宽度，移动端 100% 宽度
+
+**更新组件**:
+- ✅ `App.vue` - 顶部栏布局调整
+  - 集成 SearchBox 组件到顶部栏中央
+  - 桌面端：标题 + 搜索框 + 过滤器横向排列
+  - 移动端：搜索框独占一行，位于标题下方
+  - 修复移动端响应式布局 CSS 错误
+
+- ✅ `TaskList.vue` - 集成搜索过滤逻辑
+  - 搜索过滤优先于状态过滤（先缩小数据集）
+  - 不区分大小写的模糊匹配
+  - 空状态提示区分"无任务"和"搜索无结果"
+  - 搜索无结果时显示"未找到匹配的任务"
+
+**状态管理**:
+- ✅ `filterStore` 新增字段：
+  - `searchQuery`: 搜索关键词
+  - `hasActiveSearch`: 是否有激活的搜索（getter）
+
+**安全措施**:
+- ✅ SR-001: 搜索高亮 XSS 防护（当前版本未实现高亮功能，规避风险）
+- ✅ SR-002: 禁止 `v-html` 渲染用户输入（所有组件使用模板渲染）
+- ✅ SR-003: 搜索关键词长度限制（最大 50 字符）
+- ✅ SR-004: 优先级值验证（TypeScript 类型检查 + 运行时验证）
+
+**设计规范**:
+- 参考 `docs/ux-ui-designer/design-spec.md` 第 5.7 节
+- 搜索框样式完全符合设计规范
+- 响应式断点：Mobile < 768px, Desktop >= 768px
+
+**技术实现**:
+- 防抖函数：使用原生 JavaScript 实现，不依赖第三方库
+- 搜索过滤：先应用搜索过滤，再应用状态过滤，最后按创建时间排序
+- 超长输入处理：自动截断为 50 字符
+
+**测试结果**:
+- ✅ TypeScript 类型检查通过
+- ✅ 生产构建成功
+- ✅ XSS 攻击向量测试通过
+- ✅ 超长输入测试通过
+- ✅ 特殊字符测试通过
+
+### 2026-03-31 - v0.1.1 初始版本
 - ✅ 完成 Vue 3 + Vite + TypeScript 项目初始化
 - ✅ 实现 Pinia 状态管理
 - ✅ 实现任务 CRUD 功能

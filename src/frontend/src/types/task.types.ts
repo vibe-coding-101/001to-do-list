@@ -4,6 +4,11 @@
 export type TaskPriority = 'high' | 'medium' | 'low'
 
 /**
+ * 优先级类型别名（用于组件）
+ */
+export type Priority = TaskPriority
+
+/**
  * 任务完成状态
  */
 export type TaskStatus = 'completed' | 'uncompleted'

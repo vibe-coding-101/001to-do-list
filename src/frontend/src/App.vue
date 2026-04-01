@@ -6,6 +6,7 @@
         <h1 class="header__title">
           我的待办事项
         </h1>
+        <SearchBox v-model="filterStore.searchQuery" />
         <FilterTabs v-model="filterStore.currentFilter" />
       </div>
     </header>
@@ -64,6 +65,7 @@ import { useFilterStore } from '@/stores/filter'
 import TaskList from '@/components/TaskList.vue'
 import TaskInput from '@/components/TaskInput.vue'
 import FilterTabs from '@/components/FilterTabs.vue'
+import SearchBox from '@/components/SearchBox.vue'
 
 const taskStore = useTaskStore()
 const filterStore = useFilterStore()
@@ -113,7 +115,6 @@ onMounted(async () => {
   height: var(--header-height);
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--spacing-md);
 }
 
@@ -199,12 +200,22 @@ onMounted(async () => {
 
 /* 移动端适配 */
 @media (max-width: 767px) {
+  .header {
+    position: relative;
+    height: auto;
+  }
+
   .header__content {
-    height: var(--header-height-mobile);
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: var(--spacing-sm) 0;
+    gap: var(--spacing-sm);
   }
 
   .header__title {
     font-size: var(--font-size-h2);
+    text-align: center;
   }
 
   .main__content {

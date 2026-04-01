@@ -1,7 +1,8 @@
 # 数据模型文档
 **项目名称**: 待办事项列表应用 (To-Do List App)
-**文档版本**: v0.1.1
+**文档版本**: v0.2.0
 **创建日期**: 2026-03-31
+**更新日期**: 2026-04-01
 **架构师**: 小虾米
 
 ---
@@ -841,6 +842,203 @@ taskStore.tasks = updatedTasks
 - **删除任务**: 使用 `deleteTask()` 函数,保持数组操作的一致性
 - **验证数据**: 在保存前调用 `validateTask()` 验证数据完整性
 - **错误处理**: 始终捕获 LocalStorage 异常,提供友好的错误提示
+
+---
+
+## 13. v0.2.0 版本数据模型更新
+
+### 13.1 优先级字段
+
+**状态**: 已实现
+
+数据模型已在 v0.1.1 中支持 `priority` 字段,v0.2.0 只需实现 UI 组件。
+
+**字段定义**:
+```typescript
+priority: TaskPriority  // 'high' | 'medium' | 'low', 默认 'medium'
+```
+
+**兼容性处理**:
+- 旧数据没有 `priority` 字段时,在 `loadTasks()` 中自动设置为 'medium'
+- 使用 TypeScript 的可选链和空值合并运算符确保兼容性
+
+### 13.2 搜索功能
+
+**新增类型定义**:
+
+```typescript
+/**
+ * 搜索查询状态
+ */
+export interface SearchState {
+  query: string  // 搜索关键词
+}
+
+/**
+ * 搜索结果
+ */
+export interface SearchResult {
+  tasks: Task[]   // 匹配的任务列表
+  total: number   // 总数
+  query: string   // 搜索关键词
+}
+```
+
+**搜索实现**:
+```typescript
+/**
+ * 根据关键词搜索任务
+ * @param tasks - 任务列表
+ * @param query - 搜索关键词
+ * @returns 匹配的任务列表
+ */
+export function searchTasks(tasks: Task[], query: string): Task[] {
+  if (!query || query.trim().length === 0) {
+    return tasks
+  }
+
+  const normalizedQuery = query.trim().toLowerCase()
+  return tasks.filter((task) =>
+    task.text.toLowerCase().includes(normalizedQuery)
+  )
+}
+```
+
+**搜索与过滤的组合**:
+```typescript
+// 在 useFilterStore 中
+const filteredTasks = computed(() => {
+  let tasks = taskStore.tasks
+
+  // 1. 应用状态过滤
+  if (currentFilter.value === 'uncompleted') {
+    tasks = tasks.filter((t) => t.status === 'uncompleted')
+  } else if (currentFilter.value === 'completed') {
+    tasks = tasks.filter((t) => t.status === 'completed')
+  }
+
+  // 2. 应用搜索 (AND 关系)
+  const searchQuery = searchStore.searchQuery.trim().toLowerCase()
+  if (searchQuery) {
+    tasks = tasks.filter((t) =>
+      t.text.toLowerCase().includes(searchQuery)
+    )
+  }
+
+  // 3. 排序
+  return tasks.sort((a, b) => b.createdAt - a.createdAt)
+})
+```
+
+### 13.3 数据迁移
+
+**场景**: 为旧数据添加 `priority` 字段
+
+**迁移策略**:
+```typescript
+/**
+ * 迁移到 v0.2.0
+ * 为没有 priority 字段的旧数据添加默认值
+ */
+function migrateTo_v0_2_0(): void {
+  const data = localStorage.getItem(STORAGE_KEYS.TASKS)
+  if (!data) return
+
+  const parsed = JSON.parse(data)
+  const tasks = parsed.tasks || parsed
+
+  const migratedTasks = tasks.map((task: any) => ({
+    ...task,
+    priority: task.priority || 'medium'  // 添加默认值
+  }))
+
+  saveTasks(migratedTasks)
+}
+```
+
+**版本检测**:
+```typescript
+const VERSION = '0.2.0'
+
+// 在应用启动时检测版本
+const currentVersion = localStorage.getItem(STORAGE_KEYS.VERSION)
+if (!currentVersion || currentVersion < VERSION) {
+  migrateTo_v0_2_0()
+  localStorage.setItem(STORAGE_KEYS.VERSION, VERSION)
+}
+```
+
+### 13.4 性能优化
+
+**搜索性能**:
+- 使用防抖函数减少计算次数 (200ms)
+- 使用 Vue 3 的 `computed` 缓存搜索结果
+- 时间复杂度: O(n),n 为任务数量
+
+**内存优化**:
+- 搜索结果直接引用原始 Task 对象,不创建新对象
+- 使用 `Array.prototype.filter()` 而非创建新数组
+
+**LocalStorage 优化**:
+- 搜索状态不持久化 (仅保存在内存中)
+- 仅持久化 tasks 和 filter 状态
+
+---
+
+## 14. 最佳实践
+
+### 14.1 创建任务
+
+**推荐做法**:
+```typescript
+// ✅ 使用 Store 的 addTask 方法
+await taskStore.addTask({
+  text: '完成项目文档',
+  priority: 'high'
+})
+```
+
+**不推荐做法**:
+```typescript
+// ❌ 直接操作 LocalStorage
+const tasks = JSON.parse(localStorage.getItem('tasks'))
+tasks.push({ id: 'xxx', text: 'xxx', ... })
+localStorage.setItem('tasks', JSON.stringify(tasks))
+```
+
+### 14.2 搜索任务
+
+**推荐做法**:
+```typescript
+// ✅ 使用 SearchStore + FilterStore
+searchStore.setSearchQuery('项目')
+const results = filterStore.filteredTasks  // 自动应用搜索和过滤
+```
+
+**不推荐做法**:
+```typescript
+// ❌ 手动过滤和搜索
+const results = taskStore.tasks
+  .filter(t => t.status === 'uncompleted')
+  .filter(t => t.text.includes('项目'))
+```
+
+### 14.3 更新任务
+
+**推荐做法**:
+```typescript
+// ✅ 使用 Store 的 updateTask 方法
+await taskStore.updateTask(taskId, {
+  priority: 'high'
+})
+```
+
+**不推荐做法**:
+```typescript
+// ❌ 直接修改对象
+const task = taskStore.tasks.find(t => t.id === taskId)
+task.priority = 'high'  // 不会触发响应式更新
+```
 
 ---
 

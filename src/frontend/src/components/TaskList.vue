@@ -52,6 +52,14 @@ const { loading } = storeToRefs(taskStore)
 const filteredTasks = computed(() => {
   let tasks = taskStore.tasks
 
+  // 应用搜索过滤（优先级最高，先缩小数据集）
+  if (filterStore.searchQuery.trim()) {
+    const query = filterStore.searchQuery.toLowerCase().trim()
+    tasks = tasks.filter((task) =>
+      task.text.toLowerCase().includes(query)
+    )
+  }
+
   // 应用过滤器
   if (filterStore.currentFilter === 'uncompleted') {
     tasks = tasks.filter((t) => t.status === 'uncompleted')
@@ -64,6 +72,11 @@ const filteredTasks = computed(() => {
 })
 
 const emptyStateTitle = computed(() => {
+  // 如果有搜索关键词，显示搜索相关提示
+  if (filterStore.hasActiveSearch) {
+    return '未找到匹配的任务'
+  }
+
   if (filterStore.currentFilter === 'uncompleted') {
     return '没有未完成的任务'
   }
@@ -74,6 +87,11 @@ const emptyStateTitle = computed(() => {
 })
 
 const emptyStateSubtitle = computed(() => {
+  // 如果有搜索关键词，显示搜索相关提示
+  if (filterStore.hasActiveSearch) {
+    return '尝试使用其他关键词搜索'
+  }
+
   if (filterStore.currentFilter !== 'all') {
     return '切换过滤器查看其他任务'
   }

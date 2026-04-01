@@ -111,6 +111,10 @@
           @keydown.enter="saveEdit"
           @keydown.escape="cancelEdit"
         >
+        <PrioritySelector
+          v-model="editPriority"
+          aria-label="选择任务优先级"
+        />
         <div class="edit-actions">
           <button
             class="save-button"
@@ -142,9 +146,10 @@
 
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
-import type { Task } from '@/types/task.types'
+import type { Task, Priority } from '@/types/task.types'
 import { useTaskStore } from '@/stores/task'
 import { PRIORITY_CONFIG } from '@/utils/constants'
+import PrioritySelector from './PrioritySelector.vue'
 
 interface Props {
   task: Task
@@ -157,12 +162,14 @@ const taskStore = useTaskStore()
 const isEditing = ref(false)
 const isDeleting = ref(false)
 const editText = ref('')
+const editPriority = ref<Priority>('medium')
 const editError = ref('')
 const editInputRef = ref<HTMLInputElement>()
 
 const startEdit = async () => {
   isEditing.value = true
   editText.value = props.task.text
+  editPriority.value = props.task.priority
   editError.value = ''
 
   await nextTick()
@@ -177,7 +184,8 @@ const saveEdit = async () => {
 
   try {
     await taskStore.updateTask(props.task.id, {
-      text: editText.value
+      text: editText.value,
+      priority: editPriority.value
     })
     isEditing.value = false
     editError.value = ''
@@ -189,6 +197,7 @@ const saveEdit = async () => {
 const cancelEdit = () => {
   isEditing.value = false
   editText.value = ''
+  editPriority.value = 'medium'
   editError.value = ''
 }
 

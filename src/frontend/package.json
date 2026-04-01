@@ -1,6 +1,6 @@
 {
   "name": "todo-list-app",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "A simple and efficient to-do list application",
   "scripts": {

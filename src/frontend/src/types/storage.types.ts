@@ -15,6 +15,12 @@ export const STORAGE_KEYS = {
   FILTER: 'todo_app_filter',
 
   /**
+   * 滚动位置像素值
+   * 类型: number
+   */
+  SCROLL_TOP: 'todo_app_scroll_top',
+
+  /**
    * 数据 Schema 版本号 (用于数据迁移)
    * 类型: string
    */

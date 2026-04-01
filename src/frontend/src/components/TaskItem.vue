@@ -41,6 +41,12 @@
         </button>
 
         <span
+          class="priority-dot"
+          :class="`priority-dot--${task.priority}`"
+          aria-hidden="true"
+        />
+
+        <span
           class="task-text"
           :title="task.text"
         >
@@ -231,6 +237,10 @@ const handleDelete = async () => {
   border-radius: var(--radius-lg);
   padding: 14px 16px;
   box-shadow: var(--shadow-1);
+  height: 62px;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-shrink: 0;
   transition:
     transform var(--duration-normal) var(--easing-standard),
     box-shadow var(--duration-normal) var(--easing-standard),
@@ -257,6 +267,9 @@ const handleDelete = async () => {
   border: 2px solid var(--color-primary);
   box-shadow: var(--shadow-2);
   padding: 13px 15px;
+  height: 62px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 /* === 正常显示模式 === */
@@ -301,6 +314,31 @@ const handleDelete = async () => {
 
 .task-item--completed .checkbox .check-icon {
   color: #FFFFFF;
+}
+
+/* === 优先级小圆点 === */
+.priority-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background-color var(--duration-normal) var(--easing-standard);
+}
+
+.priority-dot--high {
+  background: var(--priority-high-color);
+}
+
+.priority-dot--medium {
+  background: var(--priority-medium-color);
+}
+
+.priority-dot--low {
+  background: var(--priority-low-color);
+}
+
+.task-item--completed .priority-dot {
+  background: var(--color-text-disabled);
 }
 
 /* === 任务文字 === */

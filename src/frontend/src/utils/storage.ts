@@ -114,7 +114,43 @@ export function saveFilter(filter: string): void {
 }
 
 /**
+ * 保存滚动位置
+ */
+export function saveScrollPosition(key: string, value: number): void {
+  if (!isLocalStorageAvailable()) return
+  try {
+    localStorage.setItem(key, String(value))
+  } catch {
+    // 静默降级
+  }
+}
+
+/**
+ * 读取滚动位置
+ */
+export function loadScrollPosition(key: string): number | null {
+  if (!isLocalStorageAvailable()) return null
+  try {
+    const value = localStorage.getItem(key)
+    return value !== null ? Number(value) : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 合法状态值（安全需求 SR-004）
+ */
+const VALID_STATUSES = ['completed', 'uncompleted'] as const
+
+/**
+ * 合法优先级值（安全需求 SR-004）
+ */
+const VALID_PRIORITIES = ['high', 'medium', 'low'] as const
+
+/**
  * 验证 Task 数据格式
+ * 包含枚举值验证，防止非法数据注入（安全需求 v0.4.0 P0）
  */
 function isValidTask(task: any): task is Task {
   return (
@@ -123,7 +159,9 @@ function isValidTask(task: any): task is Task {
     typeof task.id === 'string' &&
     typeof task.text === 'string' &&
     typeof task.status === 'string' &&
+    VALID_STATUSES.includes(task.status as typeof VALID_STATUSES[number]) &&
     typeof task.priority === 'string' &&
+    VALID_PRIORITIES.includes(task.priority as typeof VALID_PRIORITIES[number]) &&
     typeof task.createdAt === 'number' &&
     typeof task.updatedAt === 'number' &&
     (task.completedAt === null ||

@@ -1,14 +1,27 @@
 <template>
   <div
+    ref="containerRef"
     class="priority-selector"
     role="radiogroup"
     :aria-label="ariaLabel"
   >
+    <!-- 滑块背景 -->
+    <div
+      ref="sliderRef"
+      class="priority-selector__slider"
+      :class="`priority-selector__slider--${modelValue}`"
+      aria-hidden="true"
+    />
+
     <button
       v-for="option in priorityOptions"
       :key="option.value"
+      ref="optionRefs"
       class="priority-option"
-      :class="{ 'priority-option--active': modelValue === option.value }"
+      :class="[
+        `priority-option--${option.value}`,
+        { 'priority-option--active': modelValue === option.value }
+      ]"
       type="button"
       :aria-label="`${option.label}优先级`"
       :aria-checked="modelValue === option.value"
@@ -21,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { PRIORITY_CONFIG } from '@/utils/constants'
 
 interface Props {
@@ -33,8 +46,7 @@ interface Emits {
   (e: 'update:modelValue', value: 'high' | 'medium' | 'low'): void
 }
 
-defineProps<Props>()
-
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 // 优先级选项列表
@@ -54,10 +66,66 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
     console.error('[Security] Invalid priority value:', value)
   }
 }
+
+const containerRef = ref<HTMLElement>()
+const sliderRef = ref<HTMLElement>()
+const optionRefs = ref<HTMLElement[]>([])
+
+/** 优先级色值映射 */
+const priorityBgMap: Record<string, string> = {
+  high: 'var(--priority-high-bg)',
+  medium: 'var(--priority-medium-bg)',
+  low: 'var(--priority-low-bg)'
+}
+
+const priorityBorderMap: Record<string, string> = {
+  high: 'var(--priority-high-border)',
+  medium: 'var(--priority-medium-border)',
+  low: 'var(--priority-low-border)'
+}
+
+/** 更新滑块位置、宽度和颜色 */
+function updateSlider(): void {
+  if (!containerRef.value || !sliderRef.value) return
+
+  const activeIndex = priorityOptions.value.findIndex((o) => o.value === props.modelValue)
+  const activeOption = optionRefs.value[activeIndex]
+  if (!activeOption) return
+
+  const containerPadding = parseFloat(getComputedStyle(containerRef.value).paddingLeft)
+  const offsetX = activeOption.offsetLeft - containerPadding
+
+  sliderRef.value.style.width = `${activeOption.offsetWidth}px`
+  sliderRef.value.style.transform = `translateX(${offsetX}px)`
+  sliderRef.value.style.backgroundColor = priorityBgMap[props.modelValue]
+  sliderRef.value.style.borderColor = priorityBorderMap[props.modelValue]
+}
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  nextTick(() => updateSlider())
+
+  if (containerRef.value) {
+    resizeObserver = new ResizeObserver(() => updateSlider())
+    resizeObserver.observe(containerRef.value)
+  }
+})
+
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+})
+
+watch(
+  () => props.modelValue,
+  () => nextTick(() => updateSlider())
+)
 </script>
 
 <style scoped>
 .priority-selector {
+  position: relative;
   display: inline-flex;
   gap: var(--spacing-xs);
   padding: 2px;
@@ -66,7 +134,25 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   border: 1px solid var(--color-border);
 }
 
+/* 滑块 */
+.priority-selector__slider {
+  position: absolute;
+  top: 2px;
+  height: calc(100% - 4px);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-1);
+  border: 1px solid transparent;
+  transition: transform 200ms var(--easing-standard),
+              width 200ms var(--easing-standard),
+              background-color 200ms var(--easing-standard),
+              border-color 200ms var(--easing-standard);
+  z-index: 0;
+  pointer-events: none;
+}
+
 .priority-option {
+  position: relative;
+  z-index: 1;
   padding: 6px 12px;
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-medium);
@@ -75,12 +161,11 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: color var(--duration-fast) var(--easing-standard);
   white-space: nowrap;
 }
 
 .priority-option:hover:not(.priority-option--active) {
-  background: rgba(255, 255, 255, 0.6);
   color: var(--color-text-primary);
 }
 
@@ -93,28 +178,35 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
   outline-offset: 2px;
 }
 
-/* 高优先级选中态 */
-.priority-option--active[aria-checked="true"] {
-  background: var(--priority-high-bg);
+/* 选中态 - 仅保留文字色变化 */
+.priority-option--high.priority-option--active {
+  background: transparent;
   color: var(--priority-high-color);
-  border: 1px solid var(--priority-high-border);
-  box-shadow: var(--shadow-1);
+  border: none;
+  box-shadow: none;
 }
 
-/* 中优先级选中态 - 通过 aria-label 区分 */
-.priority-option[aria-label="中优先级"].priority-option--active {
-  background: var(--priority-medium-bg);
+.priority-option--medium.priority-option--active {
+  background: transparent;
   color: var(--priority-medium-color);
-  border: 1px solid var(--priority-medium-border);
-  box-shadow: var(--shadow-1);
+  border: none;
+  box-shadow: none;
 }
 
-/* 低优先级选中态 */
-.priority-option[aria-label="低优先级"].priority-option--active {
-  background: var(--priority-low-bg);
+.priority-option--low.priority-option--active {
+  background: transparent;
   color: var(--priority-low-color);
-  border: 1px solid var(--priority-low-border);
-  box-shadow: var(--shadow-1);
+  border: none;
+  box-shadow: none;
+}
+
+/* prefers-reduced-motion 降级 */
+@media (prefers-reduced-motion: reduce) {
+  .priority-selector__slider {
+    transition: width 200ms var(--easing-standard),
+                background-color 200ms var(--easing-standard),
+                border-color 200ms var(--easing-standard);
+  }
 }
 
 /* 移动端适配 */
@@ -129,6 +221,7 @@ const handleSelect = (value: 'high' | 'medium' | 'low') => {
     padding: 8px 12px;
     font-size: var(--font-size-body);
     min-height: 36px;
+    text-align: center;
   }
 }
 </style>

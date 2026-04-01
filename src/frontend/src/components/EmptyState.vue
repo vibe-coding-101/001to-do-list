@@ -134,4 +134,15 @@ withDefaults(defineProps<Props>(), {
     font-size: var(--font-size-small);
   }
 }
+
+/* prefers-reduced-motion 降级 */
+@media (prefers-reduced-motion: reduce) {
+  .empty-state {
+    animation: none;
+  }
+
+  .empty-state__icon {
+    animation: none;
+  }
+}
 </style>

@@ -7,7 +7,13 @@
           我的待办事项
         </h1>
         <SearchBox v-model="filterStore.searchQuery" />
-        <FilterTabs v-model="filterStore.currentFilter" />
+        <FilterTabs
+          :model-value="filterStore.currentFilter"
+          :total-count="taskStore.taskCount"
+          :uncompleted-count="taskStore.uncompletedCount"
+          :completed-count="taskStore.completedTasks.length"
+          @update:model-value="filterStore.setFilter"
+        />
       </div>
     </header>
 
@@ -95,10 +101,11 @@ onMounted(async () => {
 
 <style scoped>
 .app {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--color-background);
+  overflow: hidden;
 }
 
 /* 顶部栏 */
@@ -146,6 +153,8 @@ onMounted(async () => {
   flex-direction: column;
   padding-top: var(--spacing-lg);
   padding-bottom: var(--spacing-xxl);
+  overflow: hidden;
+  min-height: 0;
 }
 
 /* 输入区 */

@@ -77,27 +77,27 @@ img {
 
 /* 滚动条样式 */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-surface);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: var(--radius-sm);
+  background: #CBD5E1;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary);
+  background: #94A3B8;
 }
 
 /* 选中文字样式 */
 ::selection {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: rgba(79, 70, 229, 0.2);
+  color: #0F172A;
 }
 
 /* 焦点样式 */

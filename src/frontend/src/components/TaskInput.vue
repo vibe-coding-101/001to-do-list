@@ -129,13 +129,13 @@ defineExpose({
 
 .input-field {
   flex: 1;
-  height: 40px;
+  height: 44px;
   padding: 10px 14px;
   font-size: var(--font-size-body);
   color: var(--color-text-primary);
   background: var(--color-background);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   transition: all var(--duration-normal) var(--easing-standard);
 }
 
@@ -145,7 +145,7 @@ defineExpose({
 
 .input-field:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .input-field:disabled {
@@ -165,20 +165,21 @@ defineExpose({
   width: 40px;
   height: 40px;
   color: white;
-  background: var(--color-primary);
-  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  border-radius: var(--radius-md);
   transition: all var(--duration-fast) var(--easing-standard);
   flex-shrink: 0;
 }
 
 .add-button:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  transform: scale(1.02);
+  background: var(--gradient-primary-hover, linear-gradient(135deg, #4338CA, #6D28D9));
+  box-shadow: var(--shadow-primary);
+  transform: scale(1.05);
 }
 
 .add-button:active:not(:disabled) {
-  background: var(--color-primary-active);
-  transform: scale(0.98);
+  background: var(--gradient-primary-hover, linear-gradient(135deg, #4338CA, #6D28D9));
+  transform: scale(0.92);
 }
 
 .add-button:disabled {

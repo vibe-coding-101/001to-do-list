@@ -20,6 +20,10 @@
 - ✅ 任务优先级、过滤、搜索等功能
 - ✅ 无需后端服务,即开即用
 
+## 界面预览
+
+![待办事项列表应用界面截图](assets/todo-list-ui.png)
+
 ---
 
 ## 技术栈
@@ -122,6 +126,7 @@ npm run preview
 
 ```
 .
+├── assets/                        # 项目截图等说明文档资源
 ├── docs/                          # 项目文档
 │   ├── devops-engineer/          # 运维文档
 │   ├── software-architect/       # 架构文档
